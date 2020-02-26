@@ -6,54 +6,59 @@ type person struct {
 	first string
 }
 
-func (p person) speak()  {
-	fmt.Println("From a person - this is my name", p.first)
+type mongo map[int]person
+type postg map[int]person
+
+func (m mongo) save(n int, p person) {
+	m[n] = p
 }
 
-type secretAgent struct {
-	person
-	ltk	bool
+func (m mongo) retrieve(n int) person {
+	return m[n]
 }
 
-func (sa secretAgent) speak()  {
-	fmt.Println("I am a secret agent - this is my name", sa.first)
+func (pg postg) save(n int, p person) {
+	pg[n] = p
 }
 
-
-// Any TYPE that has the methods specified by an interface
-// is also of the interface type
-type human interface {
-	speak()
+func (pg postg) retrieve(n int) person {
+	return pg[n]
 }
 
-func foo(h human) {
-	h.speak()
+type accessor interface {
+	save(n int, p person)
+	retrieve(n int) person
 }
+
+func put(a accessor, n int, p person)  {
+	a.save(n, p)
+}
+
+func get(a accessor, n int) person {
+	return a.retrieve(n)
+}
+
 func main() {
+	dbm := mongo{}
+	dbp := postg{}
+
 	p1 := person{
-		first: "Miss MoneyPenny",
-	}
-	
-	sa1 := secretAgent{
-		person: person{
-			first: "James Bond",
-		},
-		ltk:    true,
+		first: "Senny",
 	}
 
-	//fmt.Printf("%T\n", p1)
+	p2 := person{
+		first: "James",
+	}
 
-	// In Go a VALUE can be of more than one TYPE
-	// in this example, p1 is both TYPE person and TYPE human
-	var x, y human
-	x = p1
-	y = sa1
-	x.speak()
-	y.speak()
+	put(dbm, 1, p1)
+	put(dbm, 2, p2)
 
-	println("________________________________")
-	foo(x)
-	foo(y)
-	foo(p1)
-	foo(sa1)
+	fmt.Println(get(dbm, 1))
+	fmt.Println(get(dbm, 2))
+
+	put(dbp, 1, p1)
+	put(dbp, 2, p2)
+
+	fmt.Println(get(dbp, 1))
+	fmt.Println(get(dbp, 2))
 }
