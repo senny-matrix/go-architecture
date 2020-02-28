@@ -2,44 +2,20 @@ package main
 
 import "fmt"
 
-type person struct {
-	first string
+type hotDog int
+
+func (h hotDog) cook(){
+	fmt.Println("I am cooking!")
 }
 
-type secretAgent struct {
-	person
-	ltk bool
+type hotFood interface {
+	cook()
 }
 
-func (p person) speak() {
-	fmt.Println("From a person ", p.first)
-}
-
-func (sa secretAgent) speak() {
-	fmt.Println("This is not my real name b/c I'm a secret agent ", sa.first)
-}
-
-type human interface {
-	speak()
-}
-
-func saySomething(h human) {
-	h.speak()
-}
-
-func main() {
-	p1 := person{
-		first: "Jemmy",
-	}
-
-	sa1 := secretAgent{
-		person: person{
-			first: "James",
-		},
-		ltk:true,
-	}
-
-	saySomething(p1)
-
-	saySomething(sa1)
+func main()  {
+	var x hotDog = 42
+	var y hotFood
+	y = x
+	z := hotFood(y)
+	fmt.Println(z)
 }
