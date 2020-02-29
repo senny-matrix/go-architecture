@@ -1,61 +1,28 @@
 package main
 
-import "fmt"
-
-type user struct {
-	first string
-}
-
-type mongo map[int]user
-
-func (m mongo) save(n int, u user)  {
-	m[n] = u
-}
-
-func (m mongo) retrieve(n int) user  {
-	return m[n]
-}
-
-type harddrive map[int]user
-
-func (hd harddrive) save(n int, u user)  {
-
-	hd[n] = u
-}
-
-func (hd harddrive) retrieve(n int) user  {
-	return hd[n]
-}
-
-type accessor interface {
-	save(n int, u user)
-	retrieve(n int) user
-}
-
-func put(a accessor, n int, u user)  {
-	a.save(n,u)
-}
-
-func get(a accessor, n int) user {
-	return a.retrieve(n)
-}
+import (
+	"fmt"
+	"io"
+	"os"
+)
 
 func main() {
-	//storage := mongo{}
-	storage := harddrive{}
+	f, err := os.Open("file-01.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
 
-	u1 := user{
-		first: "Rogers",
+	f2, err := os.Create("file0-2.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f2.Close()
+
+	n, err := io.Copy(f2, f)
+	if err != nil {
+		panic(err)
 	}
 
-	u2 := user{
-		first: "Dyness",
-	}
-
-	put(storage, 1, u1)
-	put(storage, 2, u2)
-
-	fmt.Println(get(storage, 1))
-	fmt.Println(get(storage, 2))
-
+	fmt.Println("Bytes written", n)
 }
